@@ -7,12 +7,31 @@ class RandomForestModel:
     def __init__(self, regr_kargs={}):
         self.model = RandomForestRegressor(**regr_kargs)
 
-    def train(self, train_path):
-        data = pd.read_pickle(train_path)
+    def train(self, /, data=None, data_path=None):
+        if data_path is not None:
+            data = pd.read_pickle(data_path)
+        if data is None:
+            raise ValueError('No Data')
+        
         X = data.drop('winPlacePerc', axis=1)
         y = data['winPlacePerc']
+
         self.model.fit(X, y)
-        print(f'Train MAE: {mean_absolute_error(y, self.predict(X))}')
+
+        pred = self.model.predict(X)
+        print(f'Train MAE: {mean_absolute_error(y, pred)}')
+
+    def validation(self, /, data=None, data_path=None):
+        if data_path is not None:
+            data = pd.read_pickle(data_path)
+        if data is None:
+            raise ValueError('No Data')
+        
+        X = data.drop('winPlacePerc', axis=1)
+        y = data['winPlacePerc']
+
+        pred = self.model.predict(X)
+        print(f'Val MAE: {mean_absolute_error(y, pred)}')
     
     def load_model(self, model_path):
         with open(model_path, 'rb') as file:

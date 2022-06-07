@@ -17,3 +17,8 @@ def train_val_split(input_path, train_path, val_path, random_state=42):
     train_data, val_data = train_test_split(data, random_state=random_state)
     train_data.to_pickle(train_path)
     val_data.to_pickle(val_path)
+
+def sampling(input_path, output_path, n, random_state=42):
+    data = pd.read_pickle(input_path)
+    data = data.sample(n=100000, random_state=random_state)
+    data.to_pickle(output_path)
