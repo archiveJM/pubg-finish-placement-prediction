@@ -16,7 +16,7 @@ class RandomForestModel:
         pred = self.model.predict(X)
         print(f'Train MAE: {mean_absolute_error(y, pred)}')
 
-    def validation(self, /, data=None, data_path=None):
+    def validation(self, data):
         X, y = split_Xy(data)
 
         pred = self.model.predict(X)

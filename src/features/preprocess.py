@@ -16,14 +16,27 @@ def get_data(data):
             data = pd.read_csv(data)
     return data
 
-def to_pickle(input_data, output_path):
+def dropna(input_data, output_path=None):
     data = get_data(input_data)
-    data.to_pickle(output_path)
+    data = data.dropna()
+    if output_path is not None:
+        data.to_pickle(output_path)
+    return data
 
-def transform_columns(input_data, output_path=None):
+def add_groupsize(input_data, output_path=None):
     data = get_data(input_data)
-    data.drop(['Id', 'groupId', 'matchId', 'matchType'], axis=1, inplace=True)
-    data.dropna(inplace=True)
+    data = data.merge(
+        right = data.groupId.value_counts().rename('groupSize'),
+        left_on = 'groupId',
+        right_index = True,
+    )
+    if output_path is not None:
+        data.to_pickle(output_path)
+    return data
+
+def select_numeric(input_data, output_path=None):
+    data = get_data(input_data)
+    data = data.select_dtypes(include='number')
     if output_path is not None:
         data.to_pickle(output_path)
     return data
