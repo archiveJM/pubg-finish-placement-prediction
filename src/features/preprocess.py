@@ -44,8 +44,6 @@ def select_numeric(input_data, output_path=None):
 def train_val_split(input_data, train_path=None, val_path=None, random_state=42):
     data = get_data(input_data)
     train_data, val_data = train_test_split(data, random_state=random_state)
-    train_data.to_pickle(train_path)
-    val_data.to_pickle(val_path)
     if train_path is not None:
         train_data.to_pickle(train_path)
     if val_path is not None:
