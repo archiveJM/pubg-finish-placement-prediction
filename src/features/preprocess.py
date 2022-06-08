@@ -1,24 +1,53 @@
+import os
 import pandas as pd
 import pickle
 from sklearn.model_selection import train_test_split
 
-def to_pickle(input_path, output_path):
-    data = pd.read_csv(input_path)
+def get_data(data):
+    """
+    data 경로의 파일을 불러와서 df로 반환.
+    data 가 str 이 아니면 그대로 반환.
+    """
+    if isinstance(data, str):
+        ext = os.path.splitext(data)[-1]
+        if ext == '.pkl':
+            data = pd.read_pickle(data)
+        elif ext == '.csv':
+            data = pd.read_csv(data)
+    return data
+
+def to_pickle(input_data, output_path):
+    data = get_data(input_data)
     data.to_pickle(output_path)
 
-def transform_columns(input_path, output_path):
-    data = pd.read_pickle(input_path)
+def transform_columns(input_data, output_path=None):
+    data = get_data(input_data)
     data.drop(['Id', 'groupId', 'matchId', 'matchType'], axis=1, inplace=True)
     data.dropna(inplace=True)
-    data.to_pickle(output_path)
+    if output_path is not None:
+        data.to_pickle(output_path)
+    return data
 
-def train_val_split(input_path, train_path, val_path, random_state=42):
-    data = pd.read_pickle(input_path)
+def train_val_split(input_data, train_path=None, val_path=None, random_state=42):
+    data = get_data(input_data)
     train_data, val_data = train_test_split(data, random_state=random_state)
     train_data.to_pickle(train_path)
     val_data.to_pickle(val_path)
+    if train_path is not None:
+        train_data.to_pickle(train_path)
+    if val_path is not None:
+        val_data.to_pickle(val_path)
+    return train_data, val_data
 
-def sampling(input_path, output_path, n, random_state=42):
-    data = pd.read_pickle(input_path)
+def sampling(input_data, output_path=None, *, n, random_state=42):
+    data = get_data(input_data)
     data = data.sample(n=100000, random_state=random_state)
-    data.to_pickle(output_path)
+    if output_path is not None:
+        data.to_pickle(output_path)
+    return data
+
+def split_Xy(input_data, target='winPlacePerc'):
+    data = get_data(input_data)
+    X = data.drop('winPlacePerc', axis=1)
+    y = data['winPlacePerc']
+    return X, y

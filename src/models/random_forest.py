@@ -2,19 +2,14 @@ import pandas as pd
 import pickle
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
+from ..features.preprocess import split_Xy
 
 class RandomForestModel:
     def __init__(self, regr_kargs={}):
         self.model = RandomForestRegressor(**regr_kargs)
 
-    def train(self, /, data=None, data_path=None):
-        if data_path is not None:
-            data = pd.read_pickle(data_path)
-        if data is None:
-            raise ValueError('No Data')
-        
-        X = data.drop('winPlacePerc', axis=1)
-        y = data['winPlacePerc']
+    def train(self, data):
+        X, y = split_Xy(data)
 
         self.model.fit(X, y)
 
@@ -22,13 +17,7 @@ class RandomForestModel:
         print(f'Train MAE: {mean_absolute_error(y, pred)}')
 
     def validation(self, /, data=None, data_path=None):
-        if data_path is not None:
-            data = pd.read_pickle(data_path)
-        if data is None:
-            raise ValueError('No Data')
-        
-        X = data.drop('winPlacePerc', axis=1)
-        y = data['winPlacePerc']
+        X, y = split_Xy(data)
 
         pred = self.model.predict(X)
         print(f'Val MAE: {mean_absolute_error(y, pred)}')
