@@ -16,11 +16,19 @@ def get_data(data):
             data = pd.read_csv(data)
     return data
 
+def save_data(data: 'pd.DataFrame', path:str):
+    if path is None:
+        return
+    ext = os.path.splitext(path)[-1]
+    if ext == '.pkl':
+        data.to_pickle(path)
+    elif ext == '.csv':
+        data.to_csv(path)
+
 def dropna(input_data, output_path=None):
     data = get_data(input_data)
     data = data.dropna()
-    if output_path is not None:
-        data.to_pickle(output_path)
+    save_data(data, output_path)
     return data
 
 def add_groupsize(input_data, output_path=None):
@@ -30,31 +38,26 @@ def add_groupsize(input_data, output_path=None):
         left_on = 'groupId',
         right_index = True,
     )
-    if output_path is not None:
-        data.to_pickle(output_path)
+    save_data(data, output_path)
     return data
 
 def select_numeric(input_data, output_path=None):
     data = get_data(input_data)
     data = data.select_dtypes(include='number')
-    if output_path is not None:
-        data.to_pickle(output_path)
+    save_data(data, output_path)
     return data
 
 def train_val_split(input_data, train_path=None, val_path=None, random_state=42):
     data = get_data(input_data)
     train_data, val_data = train_test_split(data, random_state=random_state)
-    if train_path is not None:
-        train_data.to_pickle(train_path)
-    if val_path is not None:
-        val_data.to_pickle(val_path)
+    save_data(train_data, train_path)
+    save_data(val_data, val_path)
     return train_data, val_data
 
 def sampling(input_data, output_path=None, *, n, random_state=42):
     data = get_data(input_data)
     data = data.sample(n=100000, random_state=random_state)
-    if output_path is not None:
-        data.to_pickle(output_path)
+    save_data(data, output_path)
     return data
 
 def split_Xy(input_data, target='winPlacePerc'):
